@@ -1,7 +1,0 @@
-{
-  "tool_id": "note-summarizer",
-  "type": "go",
-  "command": [
-    "./note-summarizer.exe"
-  ]
-}

@@ -1,1 +1,0 @@
-{"request":{"method":"sampling/createMessage"},"response":{"result":{"role":"assistant","content":[{"type":"text","text":"### Notes Summary (Mocked via Fixture)\n\n- **Follow-up**: Contact clients tomorrow morning.\n- **Bugs**: Resolve the critical login session issues.\n- **Workshop**: Brainstorm topic ideas and prepare presentation slides."}]}}}
