@@ -1,0 +1,12 @@
+{
+  "name": "mini-notes-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "ui:install": "cd ui && npm install",
+    "ui:build": "cd ui && npm run build",
+    "validate": "anna-app validate --strict",
+    "dev:no-llm": "anna-app dev --no-llm",
+    "test:executa-mock": "anna-app executa dev --mock-sampling mock-sampling-fixture.jsonl"
+  }
+}
