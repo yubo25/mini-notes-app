@@ -1,0 +1,70 @@
+name: Build and Release Executa Tool
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Install compression tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
+
+      - name: Run Go Code Tests
+        run: |
+          cd tool
+          go test -v ./...
+
+      - name: Compile temporary Linux binary for local Smoke Test
+        run: |
+          cd tool
+          go build -o note-summarizer-linux main.go
+
+      - name: Execute CLI JSON-RPC describe Smoke Test
+        run: |
+          echo '{"jsonrpc":"2.0","method":"describe","id":1001}' > req.json
+          ./tool/note-summarizer-linux < req.json > res.json 2> stderr.log
+          
+          echo "=== STDOUT RESPONSE ==="
+          cat res.json
+          echo "=== STDERR LOGGING ==="
+          cat stderr.log
+          
+          grep -q '"jsonrpc":"2.0"' res.json
+          grep -q '"id":1001' res.json
+          grep -q '"name":"note-summarizer"' res.json
+          echo "Local JSON-RPC validation check passed."
+
+      - name: Compile and bundle targets
+        run: |
+          chmod +x build_binary.sh
+          ./build_binary.sh --all
+
+      - name: Create release draft and upload binaries
+        uses: softprops/action-gh-release@v2  
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          files: |
+            dist/note-summarizer-*.tar.gz
+            dist/note-summarizer-*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
